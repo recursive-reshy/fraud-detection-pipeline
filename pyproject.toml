@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "imbalanced-learn>=0.14.1", # Handle imbalanced datasets
+    "joblib>=1.5.3", # Save and load trained ML models
+    "numpy>=2.4.2", # Numerical computing and array operations
     "pandas>=3.0.0", # Data manuipulation and analysis
     "pymysql>=1.1.2", # SQL driver
     "pyyaml>=6.0.3", # Read .yaml files
