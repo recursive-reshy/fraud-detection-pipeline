@@ -5,8 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "pandas>=3.0.0", # Data manuipulation and analysis 
+    "imbalanced-learn>=0.14.1", # Handle imbalanced datasets
+    "pandas>=3.0.0", # Data manuipulation and analysis
     "pymysql>=1.1.2", # SQL driver
     "pyyaml>=6.0.3", # Read .yaml files
+    "scikit-learn>=1.8.0", # Machine Learning
     "sqlalchemy>=2.0.46", # ORM
 ]
