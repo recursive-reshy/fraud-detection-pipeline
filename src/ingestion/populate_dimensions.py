@@ -14,8 +14,12 @@ def populate_dim_time( engine: Engine ) -> int:
   logger.info( "Clearing existing data..." )
 
   with engine.connect() as connection:
-    # connection.execute( text( "TRUNCATE TABLE dim_time" ) )
-    # connection.commit()
+    # Disable FK checks temporarily to allow truncation
+    connection.execute(text("SET FOREIGN_KEY_CHECKS = 0"))
+    connection.execute( text( "TRUNCATE TABLE dim_time" ) )
+    # Re-enable FK checks
+    connection.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
+    connection.commit()
     logger.info( "Existing data cleared" )
     
     # Insert unique steps into dim_time
@@ -44,8 +48,12 @@ def populate_dim_account( engine: Engine ) -> int:
   logger.info( "Clearing existing data..." )
 
   with engine.connect() as connection:
-    # connection.execute( text( "TRUNCATE TABLE dim_account" ) )
-    # connection.commit()
+    # Disable FK checks temporarily to allow truncation
+    connection.execute(text("SET FOREIGN_KEY_CHECKS = 0"))
+    connection.execute( text( "TRUNCATE TABLE dim_account" ) )
+    # Re-enable FK checks
+    connection.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
+    connection.commit()
     logger.info( "Existing data cleared" )
     
     logger.info( "Inserting unique accounts into dim_account..." )

@@ -15,8 +15,12 @@ def populate_fact_transactions( engine: Engine ) -> int:
   logger.info( "Clearing existing data..." )
 
   with engine.connect() as connection:
-    # connection.execute( text( "TRUNCATE TABLE fact_transactions" ) )
-    # connection.commit()
+    # Disable FK checks temporarily to allow truncation
+    connection.execute(text("SET FOREIGN_KEY_CHECKS = 0"))
+    connection.execute( text( "TRUNCATE TABLE fact_transactions" ) )
+    # Re-enable FK checks
+    connection.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
+    connection.commit()
 
     logger.info( "Inserting data into fact_transactions..." )
 
