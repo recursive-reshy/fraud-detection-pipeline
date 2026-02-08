@@ -5,21 +5,27 @@ DROP TABLE IF EXISTS dim_time;
 
 CREATE TABLE dim_transaction_type (
   id CHAR(36) NOT NULL DEFAULT (UUID()) PRIMARY KEY,
-  type_name ENUM('CASH_IN', 'CASH_OUT', 'DEBIT', 'PAYMENT', 'TRANSFER'),
+  type_name ENUM('CASH_IN', 'CASH_OUT', 'DEBIT', 'PAYMENT', 'TRANSFER') UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Pre populate dim_transaction_type
+INSERT INTO dim_transaction_type (type_name) VALUES ('CASH_IN'), ('CASH_OUT'), ('DEBIT'), ('PAYMENT'), ('TRANSFER');
+
 CREATE TABLE dim_time (
   id CHAR(36) NOT NULL DEFAULT (UUID()) PRIMARY KEY,
+  step INT NOT NULL,
   hour INT NOT NULL,
-  date DATE NOT NULL
+  date DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE dim_account (
   id CHAR(36) NOT NULL DEFAULT (UUID()) PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  type ENUM('CUSTOMER', 'MERCHANT') NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  account_id VARCHAR(255) NOT NULL,
+  account_type ENUM('C', 'M') NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_account_id (account_id)
 );
 
 CREATE TABLE fact_transactions (
@@ -32,11 +38,11 @@ CREATE TABLE fact_transactions (
   destination_account_key CHAR(36) NOT NULL,
 
   -- Measures
-  amount DECIMAL(10, 2) NOT NULL,
-  old_balance_orig DECIMAL(10, 2) NOT NULL DEFAULT 0,
-  new_balance_orig DECIMAL(10, 2) NOT NULL DEFAULT 0,
-  old_balance_dest DECIMAL(10, 2) NOT NULL DEFAULT 0,
-  new_balance_dest DECIMAL(10, 2) NOT NULL DEFAULT 0,
+  amount DECIMAL(15, 2) NOT NULL,
+  old_balance_orig DECIMAL(15, 2) NOT NULL DEFAULT 0,
+  new_balance_orig DECIMAL(15, 2) NOT NULL DEFAULT 0,
+  old_balance_dest DECIMAL(15, 2) NOT NULL DEFAULT 0,
+  new_balance_dest DECIMAL(15, 2) NOT NULL DEFAULT 0,
 
   -- Fraud indicators
   is_fraud TINYINT(1) NOT NULL DEFAULT 0,
