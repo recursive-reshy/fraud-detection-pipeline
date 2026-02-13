@@ -130,7 +130,7 @@ async def predict( transaction: TransactionRequest ):
 
     prediction, probability = model_manager.predict( features )
 
-
+    prediction_logger.log_prediction( features, prediction, probability )
     return {
       "is_fraud": prediction == 1,
       "fraud_probability": probability,

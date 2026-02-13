@@ -24,6 +24,18 @@ def run_eda(file_path):
     missing = df.isnull().sum()
     print(missing[missing > 0] if missing.sum() > 0 else "No missing values.")
 
+    # Get actual fraud distribution
+    fraud_dist = df['isFraud'].value_counts()
+    fraud_rate = (fraud_dist[1] / len(df)) * 100
+
+    # Balance error analysis (after feature engineering)
+    df['error_balance_orig'] = (df['newbalanceOrig'] - df['oldbalanceOrg']) + df['amount']
+    fraud_with_errors = (df[df['isFraud']==1]['error_balance_orig'] != 0).sum()
+    fraud_error_rate = (fraud_with_errors / df[df['isFraud']==1].shape[0]) * 100
+
+    print(f"Actual fraud rate: {fraud_rate:.2f}%")
+    print(f"Fraud with balance errors: {fraud_error_rate:.2f}%")
+
     # --- Visualizations ---
     sns.set_theme(style="whitegrid")
     
