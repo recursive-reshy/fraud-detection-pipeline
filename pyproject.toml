@@ -14,5 +14,6 @@ dependencies = [
     "pymysql>=1.1.2", # SQL driver
     "pyyaml>=6.0.3", # Read .yaml files
     "scikit-learn>=1.8.0", # Machine Learning
+    "seaborn>=0.13.2",
     "sqlalchemy>=2.0.46", # ORM
 ]

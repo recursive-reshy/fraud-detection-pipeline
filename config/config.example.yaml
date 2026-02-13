@@ -8,6 +8,7 @@ database:
 data:
   # Path to the raw PaySim CSV file used for ingestion
   raw_csv: data/raw/paysim1_s.csv
+  processed_csv: data/processed/preprocessed_data.csv
 
 logging:
   # Logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
