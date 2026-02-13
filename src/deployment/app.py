@@ -2,6 +2,7 @@
 import sys
 import logging
 from pathlib import Path
+from typing import Dict
 # FastAPI
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 sys.path.append( str( Path( __file__ ).parent.parent.parent ) )
 from src.deployment.schemas import TransactionRequest, PredictionResponse, HealthResponse, ModelInfoResponse
 from src.deployment.model_loader import ModelManager
+from src.monitoring.prediction_logger import PredictionLogger
+from src.monitoring.performance_tracker import PerformanceTracker
+from src.monitoring.drift_detector import DriftDetector
 
 logging.basicConfig( 
   level = logging.INFO,
@@ -36,12 +40,19 @@ app.add_middleware(
 
 # Load model at startup
 model_manager = None
+# Initialize monitoring components
+prediction_logger = None
+performance_tracker = None
+drift_detector = None
 
 @app.on_event( "startup" )
 async def startup_event():
-  global model_manager
+  global model_manager, prediction_logger, performance_tracker, drift_detector
   try:
     model_manager = ModelManager()
+    prediction_logger = PredictionLogger()
+    performance_tracker = PerformanceTracker()
+    drift_detector = DriftDetector()
     logger.info( "Model loaded successfully" )
   except Exception as e:
     logger.error( f"Error loading model: { e }" )
@@ -56,6 +67,9 @@ async def root():
       "health": "/health",
       "predict": "/predict",
       "model_info": "/model-info",
+      "monitoring_metrics": "/monitoring/metrics",
+      "monitoring_distribution": "/monitoring/distribution",
+      "monitoring_drift": "/monitoring/drift",
     }
   }
 
@@ -88,6 +102,7 @@ async def model_info():
 
 @app.post( "/predict", response_model = PredictionResponse, tags = [ "Predict" ] )
 async def predict( transaction: TransactionRequest ):
+
   if model_manager is None:
     raise HTTPException( status_code = 500, detail = "Model not loaded" )
 
@@ -124,3 +139,28 @@ async def predict( transaction: TransactionRequest ):
   except Exception as e:
     logger.error( f"Error predicting transaction: { e }" )
     raise HTTPException( status_code = 500, detail = str( e ) )
+
+@app.get("/monitoring/metrics", tags=["Monitoring"])
+async def get_metrics( window_size: int = 100 ) -> Dict:
+    if performance_tracker is None:
+      raise HTTPException( status_code=503, detail="Monitoring not initialized" )
+    
+    metrics = performance_tracker.calculate_metrics( window_size=window_size )
+    return metrics
+
+@app.get("/monitoring/distribution", tags=["Monitoring"])
+async def get_distribution( window_size: int = 100 ) -> Dict:
+    if performance_tracker is None:
+        raise HTTPException(status_code=503, detail="Monitoring not initialized")
+    
+    distribution = performance_tracker.get_prediction_distribution(window_size=window_size)
+    return distribution
+
+
+@app.get("/monitoring/drift", tags=["Monitoring"])
+async def check_drift( threshold: float = 0.1 ) -> Dict:
+    if drift_detector is None:
+        raise HTTPException(status_code=503, detail="Monitoring not initialized")
+    
+    drift_result = drift_detector.detect_prediction_drift(threshold=threshold)
+    return drift_result

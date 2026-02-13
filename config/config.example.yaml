@@ -1,0 +1,22 @@
+###############################################
+# Example configuration for fraud detection   #
+# Copy to config/config.yaml and adjust       #
+###############################################
+
+database:
+  host: 127.0.0.1        # Database host (e.g. MariaDB / MySQL)
+  port: 3306             # Database port
+  user: your_username    # Database user
+  password: your_password  # Database password (do NOT commit real secrets)
+  database: fraud_detection  # Database name to use/create
+
+data:
+  # Path to the raw PaySim CSV file used for ingestion
+  raw_csv: data/raw/paysim1_s.csv
+
+logging:
+  # Logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: INFO
+  # Log file path for the pipeline
+  file: logs/pipeline.log
+
